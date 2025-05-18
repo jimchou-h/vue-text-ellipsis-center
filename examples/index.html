@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Vue-Demi Plugin Demo</title>
+  <script type="module">
+    import { createApp, defineComponent } from 'vue'
+    import MyPlugin from '../dist/index.es.js'
+    import App from './App.vue'
+
+    const app = createApp(App)
+    app.use(MyPlugin)
+    app.mount('#app')
+  </script>
+</head>
+<body>
+  <div id="app"></div>
+</body>
+</html>
