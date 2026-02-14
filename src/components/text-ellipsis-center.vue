@@ -1,19 +1,19 @@
 <template>
-  <div ref="container">
+  <div ref="containerRef" :style="state.containerStyle">
     <!-- Measure Prepare -->
     <div
-      v-if="status === MEASURE_STATUS.PREPARE"
+      v-if="state.status === MEASURE_STATUS.PREPARE"
       ref="fullMeasureRef"
-      :style="measureStyle"
+      :style="state.measureStyle"
       aria-hidden="true"
     >
-      {{ text }}
+      {{ props.text }}
       <slot name="expandNode" />
     </div>
     <div
-      v-if="status === MEASURE_STATUS.PREPARE"
+      v-if="state.status === MEASURE_STATUS.PREPARE"
       ref="singleRowMeasureRef"
-      :style="measureStyle"
+      :style="state.measureStyle"
       aria-hidden="true"
     >
       &nbsp;
@@ -21,9 +21,9 @@
 
     <!-- Measure Walking -->
     <div
-      v-if="status === MEASURE_STATUS.MEASURE_WALKING"
+      v-if="state.status === MEASURE_STATUS.MEASURE_WALKING"
       ref="midMeasureRef"
-      :style="measureStyle"
+      :style="state.measureStyle"
       aria-hidden="true"
       style="word-break: break-all"
     >
@@ -32,196 +32,319 @@
 
     <!-- Final Display -->
     <div v-else ref="displayRef">
-      <template v-if="expanded || status === MEASURE_STATUS.STABLE_NO_ELLIPSIS">
-        {{ text }}
+      <template
+        v-if="
+          props.expanded || state.status === MEASURE_STATUS.STABLE_NO_ELLIPSIS
+        "
+      >
+        {{ props.text }}
         <slot
           name="collapseNode"
-          v-if="status === MEASURE_STATUS.STABLE_ELLIPSIS"
+          v-if="state.status === MEASURE_STATUS.STABLE_ELLIPSIS"
         />
       </template>
-      <template v-else-if="status === MEASURE_STATUS.STABLE_ELLIPSIS">
+      <template v-else-if="state.status === MEASURE_STATUS.STABLE_ELLIPSIS">
         {{ renderContent(midIndex) }}
       </template>
     </div>
   </div>
 </template>
 
-<script>
+<script setup lang="ts">
+import {
+  reactive,
+  computed,
+  watch,
+  onMounted,
+  onBeforeUnmount,
+  nextTick,
+  type CSSProperties,
+  useTemplateRef,
+} from "vue";
+// @ts-ignore - JavaScript module without types
 import { mapItems, getObserver } from "../utils/intersection-observer";
+// @ts-ignore - JavaScript module without types
 import runes from "runes2";
+import { useResizeObserver } from "@vueuse/core";
 
-const MEASURE_STATUS = {
-  PREPARE: 1,
-  MEASURE_WALKING: 2,
-  STABLE_ELLIPSIS: 99,
-  STABLE_NO_ELLIPSIS: 100,
+// 测量状态枚举 - 使用 const enum 获得更好的类型安全性和性能
+const enum MEASURE_STATUS {
+  HIDE = 0,
+  PREPARE = 1,
+  MEASURE_WALKING = 2,
+  STABLE_ELLIPSIS = 99,
+  STABLE_NO_ELLIPSIS = 100,
+}
+
+// Props 接口定义
+interface Props {
+  /** 需要显示的文本内容 */
+  text: string;
+  /** 显示的行数 */
+  rows?: number;
+  /** 省略号位置：start(开头)、middle(中间)、end(结尾) */
+  direction?: "start" | "middle" | "end";
+  /** 是否展开显示完整内容 */
+  expanded?: boolean;
+  /** 是否使用 IntersectionObserver 进行懒加载 */
+  useObserver?: boolean;
+  /** 是否监听容器尺寸变化并自动重新计算 */
+  autoResize?: boolean;
+}
+
+// Emits 接口定义
+interface Emits {
+  (e: "update:expanded", value: boolean): void;
+}
+
+// 组件状态接口
+interface ComponentState {
+  /** 文本字符数组（支持 Unicode） */
+  contentChars: string[];
+  /** 最大允许高度 */
+  maxHeight: number;
+  /** 二分查找的索引范围 [start, end] */
+  walkingIndexes: [number, number];
+  /** 当前测量状态 */
+  status: MEASURE_STATUS;
+  /** 容器样式 */
+  containerStyle: CSSProperties;
+  /** 测量元素的样式 */
+  measureStyle: CSSProperties;
+  /** 是否已初始化 */
+  init: boolean;
+}
+
+// Props 定义 - 使用 withDefaults 提供默认值
+const props = withDefaults(defineProps<Props>(), {
+  rows: 1,
+  direction: "middle",
+  expanded: false,
+  useObserver: false,
+  autoResize: true,
+});
+
+// Emits 定义
+const emit = defineEmits<Emits>();
+
+// 模板引用
+const containerRef = useTemplateRef("containerRef");
+const fullMeasureRef = useTemplateRef("fullMeasureRef");
+const singleRowMeasureRef = useTemplateRef("singleRowMeasureRef");
+const midMeasureRef = useTemplateRef("midMeasureRef");
+
+useResizeObserver(containerRef, () => {
+  state.status = MEASURE_STATUS.HIDE;
+  startMeasure();
+});
+
+
+// 响应式状态管理
+const state = reactive<ComponentState>({
+  contentChars: [],
+  maxHeight: 0,
+  walkingIndexes: [0, 0],
+  status: MEASURE_STATUS.STABLE_NO_ELLIPSIS,
+  containerStyle: {
+    overflow: "hidden",
+    lineHeight: "1.5",
+    wordBreak: "break-all",
+  },
+  measureStyle: {
+    visibility: "hidden",
+    whiteSpace: "inherit",
+    lineHeight: "inherit",
+    fontSize: "inherit",
+  },
+  init: false,
+});
+
+/**
+ * 计算中间索引 - 用于二分查找
+ */
+const midIndex = computed(() => {
+  return Math.ceil((state.walkingIndexes[0] + state.walkingIndexes[1]) / 2);
+});
+
+/**
+ * 根据索引生成省略文本
+ * @param index 要保留的字符数量
+ * @returns 格式化后的文本
+ */
+const renderContent = (index: number): string => {
+  const prefixContent = state.contentChars.slice(0, index).join("");
+  const suffixContent = state.contentChars.slice(-index).join("");
+
+  switch (props.direction) {
+    case "start":
+      return `...${prefixContent}`;
+    case "end":
+      return `${suffixContent}...`;
+    case "middle":
+      return `${prefixContent}...${suffixContent}`;
+    default:
+      return "";
+  }
 };
 
-export default {
-  props: {
-    text: {
-      type: String,
-      required: true,
-    },
-    rows: {
-      type: Number,
-      default: 1,
-    },
-    direction: {
-      type: String,
-      default: "middle",
-    },
-    expanded: {
-      type: Boolean,
-      default: false,
-    },
-  },
-  data() {
-    return {
-      contentChars: [],
-      maxHeight: 0,
-      walkingIndexes: [0, 0],
-      status: MEASURE_STATUS.STABLE_NO_ELLIPSIS,
-      measureStyle: {
-        visibility: "hidden",
-        whiteSpace: "inherit",
-        lineHeight: "inherit",
-        fontSize: "inherit",
-      },
-
-      init: false,
-
-      MEASURE_STATUS,
-    };
-  },
-  computed: {
-    midIndex() {
-      return Math.ceil((this.walkingIndexes[0] + this.walkingIndexes[1]) / 2);
-    },
-    // 根据 index 生成文本返回
-    renderContent() {
-      return function (index) {
-        const prefixContent = this.contentChars.slice(0, index).join("");
-        const suffixContent = this.contentChars.slice(-index).join("");
-
-        if (this.direction === "start") {
-          return `...${prefixContent}`;
-        } else if (this.direction === "end") {
-          return `${suffixContent}...`;
-        } else if (this.direction === "middle") {
-          return `${prefixContent}...${suffixContent}`;
-        }
-        return "";
-      };
-    },
-  },
-  watch: {
-    text: {
-      immediate: true,
-      async handler(newContent) {
-        this.contentChars = runes(newContent);
-        // 监听要先关闭再打开,不然会有延迟
-        if (this.init) {
-          this.init = false;
-          this.cancelObserver();
-          await this.$nextTick();
-          this.openObserver();
-        }
-      },
-    },
-    async status() {
-      await this.$nextTick();
-      this.measureHeights();
-    },
-  },
-  methods: {
-    startMeasure() {
-      this.status = MEASURE_STATUS.PREPARE;
-      this.walkingIndexes = [
-        0,
-        this.direction === "middle"
-          ? Math.ceil(this.contentChars.length / 2)
-          : this.contentChars.length,
-      ];
-    },
-    async measureHeights() {
-      if (this.status === MEASURE_STATUS.PREPARE) {
-        const fullMeasureHeight = this.$refs.fullMeasureRef?.offsetHeight || 0;
-        const singleRowHeight =
-          this.$refs.singleRowMeasureRef?.offsetHeight || 0;
-        const rowMeasureHeight = singleRowHeight * this.rows;
-        if (fullMeasureHeight <= rowMeasureHeight) {
-          this.status = MEASURE_STATUS.STABLE_NO_ELLIPSIS;
-        } else {
-          this.maxHeight = rowMeasureHeight;
-          this.status = MEASURE_STATUS.MEASURE_WALKING;
-        }
-      }
-    },
-    async handleWalkingMeasure() {
-      if (this.status === MEASURE_STATUS.MEASURE_WALKING) {
-        const diff = this.walkingIndexes[1] - this.walkingIndexes[0];
-        const midHeight = this.$refs.midMeasureRef?.offsetHeight || 0;
-        if (diff > 1) {
-          if (midHeight > this.maxHeight) {
-            this.walkingIndexes = [this.walkingIndexes[0], this.midIndex];
-          } else {
-            this.walkingIndexes = [this.midIndex, this.walkingIndexes[1]];
-          }
-        } else {
-          if (midHeight > this.maxHeight) {
-            this.walkingIndexes = [
-              this.walkingIndexes[0],
-              this.walkingIndexes[0],
-            ];
-          } else {
-            this.walkingIndexes = [
-              this.walkingIndexes[1],
-              this.walkingIndexes[1],
-            ];
-          }
-          this.status = MEASURE_STATUS.STABLE_ELLIPSIS;
-        }
-      }
-    },
-    // 增加 监听
-    async openObserver() {
-      const element = this.$refs.container;
-      // 文件名计算懒加载
-      const observer = getObserver();
-      observer.observe(element);
-      mapItems.set(element, (entry) => {
-        if (entry.isIntersecting) {
-          if (this.init) {
-            return;
-          }
-          this.startMeasure();
-          this.init = true;
-        }
-      });
-    },
-    // 移除 监听
-    cancelObserver() {
-      const element = this.$refs.container;
-      const observer = getObserver();
-      observer.unobserve(element);
-      mapItems.delete(element);
-    },
-  },
-  mounted() {
-    this.openObserver();
-  },
-  beforeDestroy() {
-    this.cancelObserver();
-  },
-  updated() {
-    // renderContent 执行后触发 updated，然后再执行 handleWalkingMeasure
-    // setTimeout 确保能渲染后触发
-    setTimeout(() => {
-      if (this.status === MEASURE_STATUS.MEASURE_WALKING) {
-        this.handleWalkingMeasure();
-      }
-    }, 0)
-  },
+/**
+ * 开始测量流程
+ */
+const startMeasure = (): void => {
+  state.status = MEASURE_STATUS.PREPARE;
+  state.walkingIndexes = [
+    0,
+    props.direction === "middle"
+      ? Math.ceil(state.contentChars.length / 2)
+      : state.contentChars.length,
+  ];
 };
+
+/**
+ * 测量元素高度并决定是否需要省略
+ */
+const measureHeights = async (): Promise<void> => {
+  if (state.status === MEASURE_STATUS.PREPARE) {
+    const fullMeasureHeight = fullMeasureRef.value?.offsetHeight ?? 0;
+    const singleRowHeight = singleRowMeasureRef.value?.offsetHeight ?? 0;
+    const rowMeasureHeight = singleRowHeight * props.rows;
+
+    // 如果完整内容高度小于等于允许的最大高度，则不需要省略
+    if (fullMeasureHeight <= rowMeasureHeight) {
+      state.status = MEASURE_STATUS.STABLE_NO_ELLIPSIS;
+    } else {
+      state.maxHeight = rowMeasureHeight;
+      state.status = MEASURE_STATUS.MEASURE_WALKING;
+    }
+  }
+};
+
+/**
+ * 处理二分查找测量过程
+ */
+const handleWalkingMeasure = async (): Promise<void> => {
+  if (state.status === MEASURE_STATUS.MEASURE_WALKING) {
+    const diff = state.walkingIndexes[1] - state.walkingIndexes[0];
+    const midHeight = midMeasureRef.value?.offsetHeight ?? 0;
+
+    // 二分查找算法：根据中间元素的高度调整搜索范围
+    if (diff > 1) {
+      if (midHeight > state.maxHeight) {
+        // 中间文本过高，向左搜索
+        state.walkingIndexes = [state.walkingIndexes[0], midIndex.value];
+      } else {
+        // 中间文本合适或过低，向右搜索
+        state.walkingIndexes = [midIndex.value, state.walkingIndexes[1]];
+      }
+    } else {
+      // 找到最优解
+      if (midHeight > state.maxHeight) {
+        state.walkingIndexes = [
+          state.walkingIndexes[0],
+          state.walkingIndexes[0],
+        ];
+      } else {
+        state.walkingIndexes = [
+          state.walkingIndexes[1],
+          state.walkingIndexes[1],
+        ];
+      }
+      state.status = MEASURE_STATUS.STABLE_ELLIPSIS;
+    }
+  }
+};
+
+/**
+ * 开启 IntersectionObserver 监听
+ */
+const openObserver = async (): Promise<void> => {
+  await nextTick();
+  const element = containerRef.value;
+  if (!element) return;
+
+  const observer = getObserver();
+  observer.observe(element);
+
+  mapItems.set(element, (entry: IntersectionObserverEntry) => {
+    if (entry.isIntersecting) {
+      if (state.init) return;
+
+      startMeasure();
+      state.status = MEASURE_STATUS.PREPARE;
+      state.init = true;
+    }
+  });
+};
+
+/**
+ * 取消 IntersectionObserver 监听
+ */
+const cancelObserver = (): void => {
+  const element = containerRef.value;
+  if (!element) return;
+
+  const observer = getObserver();
+  observer.unobserve(element);
+  mapItems.delete(element);
+};
+
+// const openAutoResize = (): void => {
+
+// }
+
+// 监听文本变化，重新初始化测量
+watch(
+  () => props.text,
+  async (newContent: string) => {
+    state.contentChars = runes(newContent);
+
+    // 如果已经初始化过，需要重新开始测量流程
+    if (state.init) {
+      state.init = false;
+      cancelObserver();
+      await nextTick();
+      openObserver();
+    }
+  },
+  { immediate: true },
+);
+
+// 监听状态变化，触发高度测量
+watch(
+  () => state.status,
+  async () => {
+    await nextTick();
+    measureHeights();
+  },
+);
+
+// 模拟 Vue 2 的 updated 钩子，处理测量过程中的渲染更新
+watch([() => state.status, () => state.walkingIndexes], () => {
+  if (state.status === MEASURE_STATUS.MEASURE_WALKING) {
+    nextTick(() => {
+      handleWalkingMeasure();
+    });
+  }
+});
+
+// 组件挂载时初始化
+onMounted(() => {
+  if (props.useObserver) {
+    state.status = MEASURE_STATUS.HIDE;
+    openObserver();
+  } else {
+    startMeasure();
+  }
+
+  if (props.autoResize) {
+    // openAutoResize();
+  }
+});
+
+// 组件卸载前清理资源
+onBeforeUnmount(() => {
+  if (props.useObserver) {
+    cancelObserver();
+  }
+});
 </script>

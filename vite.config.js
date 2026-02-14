@@ -18,14 +18,15 @@ export default defineConfig({
     lib: {
       entry: path.resolve(__dirname, 'src/index.ts'),
       name,
-      fileName: (format) => `index.${format}.js`,
-      formats: ['es', 'cjs', 'umd'],
+      fileName: (format) => `vue-text-ellipsis-center.${format}.js`,
+      formats: ['es', 'umd'],
     },
+    outDir: './dist', // 打包输出目录
     rollupOptions: {
       external: ['vue'],
       output: {
         globals: {
-          vue: 'Vue',
+          'vue': 'Vue',
         },
       },
     },
