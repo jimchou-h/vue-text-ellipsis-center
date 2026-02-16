@@ -14,17 +14,17 @@
           <h3>单行省略（默认）</h3>
           <div class="demo-box">
             <text-ellipsis-center
-              text="这是一个很长长长长长长长长长长长长长长长长的文本内容，需要被省略显示"
+              text="这是一个很长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长的文本内容，需要被省略显示"
               :rows="1"
             />
           </div>
         </div>
-        
+
         <div class="demo-item">
           <h3>多行省略</h3>
           <div class="demo-box multi-line">
             <text-ellipsis-center
-              text="这是一个非常长长长长长长长长长长长长长长长长的文本内容，需要在两行内显示并自动进行省略处理"
+              text="这是一个非常长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长的文本内容，需要在两行内显示并自动进行省略处理"
               :rows="2"
             />
           </div>
@@ -45,7 +45,7 @@
             />
           </div>
         </div>
-        
+
         <div class="demo-item">
           <h3>中间省略 (direction="middle")</h3>
           <div class="demo-box">
@@ -55,7 +55,7 @@
             />
           </div>
         </div>
-        
+
         <div class="demo-item">
           <h3>结尾省略 (direction="end")</h3>
           <div class="demo-box">
@@ -77,19 +77,24 @@
           <div class="demo-box">
             <text-ellipsis-center
               v-model:expanded="expanded1"
-              text="这是一个可以展开收起的文本内容，点击按钮可以查看完整内容"
+              direction="end"
+              text="这是一个可以展开收起的文本内容，点击按钮可以查看完整内容，增加长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长度"
               :rows="1"
             >
               <template #expandNode>
-                <button class="expand-btn" @click="expanded1 = true">展开</button>
+                <button class="expand-btn" @click="expanded1 = true">
+                  展开
+                </button>
               </template>
               <template #collapseNode>
-                <button class="collapse-btn" @click="expanded1 = false">收起</button>
+                <button class="collapse-btn" @click="expanded1 = false">
+                  收起
+                </button>
               </template>
             </text-ellipsis-center>
           </div>
         </div>
-        
+
         <div class="demo-item">
           <h3>懒加载 (useObserver)</h3>
           <div class="demo-box">
@@ -117,7 +122,7 @@
             class="slider"
           />
         </div>
-        
+
         <div class="responsive-box" :style="{ width: containerWidth + 'px' }">
           <text-ellipsis-center
             :text="responsiveText"
@@ -134,19 +139,17 @@
       <div class="performance-test">
         <button @click="addItems" class="test-btn">添加项目</button>
         <button @click="clearItems" class="test-btn">清空项目</button>
-        <span class="item-count">当前项目数：{{ performanceItems.length }}</span>
-        
+        <span class="item-count"
+          >当前项目数：{{ performanceItems.length }}</span
+        >
+
         <div class="items-container">
           <div
             v-for="(item, index) in performanceItems"
             :key="index"
             class="performance-item"
           >
-            <text-ellipsis-center
-              :text="item.text"
-              :rows="1"
-              useObserver
-            />
+            <text-ellipsis-center :text="item.text" :rows="1" useObserver />
           </div>
         </div>
       </div>
@@ -155,44 +158,46 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref } from "vue";
 
 // 交互功能状态
-const expanded1 = ref(false)
+const expanded1 = ref(false);
 
 // 响应式测试状态
-const containerWidth = ref(300)
-const responsiveText = '这是一个响应式测试文本，当容器宽度变化时，省略效果会自动调整以适应新的容器尺寸'
+const containerWidth = ref(300);
+const responsiveText =
+  "这是一个响应式测试文本，当容器宽度变化时，省略效果会自动调整以适应新的容器尺寸";
 
 // 性能测试状态
-const performanceItems = ref<Array<{text: string}>>([])
+const performanceItems = ref<Array<{ text: string }>>([]);
 
 // 生成随机文本
 const generateRandomText = (length: number = 100): string => {
-  const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789中文测试文本内容'
-  let result = ''
+  const chars =
+    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789中文测试文本内容";
+  let result = "";
   for (let i = 0; i < length; i++) {
-    result += chars.charAt(Math.floor(Math.random() * chars.length))
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
   }
-  return result
-}
+  return result;
+};
 
 // 添加性能测试项目
 const addItems = () => {
   for (let i = 0; i < 10; i++) {
     performanceItems.value.push({
-      text: generateRandomText(Math.floor(Math.random() * 100) + 100)
-    })
+      text: generateRandomText(Math.floor(Math.random() * 100) + 100),
+    });
   }
-}
+};
 
 // 清空性能测试项目
 const clearItems = () => {
-  performanceItems.value = []
-}
+  performanceItems.value = [];
+};
 
 // 初始化一些测试项目
-addItems()
+addItems();
 </script>
 
 <style scoped>
@@ -200,7 +205,8 @@ addItems()
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   line-height: 1.6;
   color: #333;
 }
@@ -250,7 +256,9 @@ addItems()
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .demo-item:hover {
@@ -283,7 +291,8 @@ addItems()
   height: 60px;
 }
 
-.expand-btn, .collapse-btn {
+.expand-btn,
+.collapse-btn {
   margin-left: 8px;
   padding: 4px 8px;
   border: 1px solid #3498db;
@@ -295,7 +304,8 @@ addItems()
   transition: background-color 0.2s ease;
 }
 
-.expand-btn:hover, .collapse-btn:hover {
+.expand-btn:hover,
+.collapse-btn:hover {
   background: #2980b9;
 }
 
@@ -395,15 +405,15 @@ addItems()
   .demo-container {
     padding: 10px;
   }
-  
+
   .demo-section {
     padding: 20px;
   }
-  
+
   .demo-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .demo-header h1 {
     font-size: 2rem;
   }
