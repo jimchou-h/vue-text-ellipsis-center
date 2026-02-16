@@ -16,7 +16,7 @@
       :style="state.measureStyle"
       aria-hidden="true"
     >
-      &nbsp;
+      &nbsp;<slot name="expandNode" />
     </div>
 
     <!-- Measure Walking -->
@@ -27,7 +27,16 @@
       aria-hidden="true"
       style="word-break: break-all"
     >
-      {{ renderContent(midIndex) }}
+      <!-- {{ renderContent(midIndex) }} -->
+      <template v-if="props.direction === 'start'">
+        <slot name="expandNode" />...{{ suffixContent }}
+      </template>
+      <template v-else-if="props.direction === 'end'">
+        {{ prefixContent }}...<slot name="expandNode" />
+      </template>
+      <template v-else>
+        {{ prefixContent }}...<slot name="expandNode" />{{ suffixContent }}
+      </template>
     </div>
 
     <!-- Final Display -->
@@ -43,8 +52,19 @@
           v-if="state.status === MEASURE_STATUS.STABLE_ELLIPSIS"
         />
       </template>
-      <template v-else-if="state.status === MEASURE_STATUS.STABLE_ELLIPSIS">
+      <!-- <template v-else-if="state.status === MEASURE_STATUS.STABLE_ELLIPSIS">
         {{ renderContent(midIndex) }}
+      </template> -->
+      <template v-else-if="state.status === MEASURE_STATUS.STABLE_ELLIPSIS">
+        <template v-if="props.direction === 'start'">
+          <slot name="expandNode" />...{{ suffixContent }}
+        </template>
+        <template v-else-if="props.direction === 'end'">
+          {{ prefixContent }}...<slot name="expandNode" />
+        </template>
+        <template v-else>
+          {{ prefixContent }}...<slot name="expandNode" />{{ suffixContent }}
+        </template>
       </template>
     </div>
   </div>
@@ -138,7 +158,6 @@ useResizeObserver(containerRef, () => {
   startMeasure();
 });
 
-
 // 响应式状态管理
 const state = reactive<ComponentState>({
   contentChars: [],
@@ -167,25 +186,18 @@ const midIndex = computed(() => {
 });
 
 /**
- * 根据索引生成省略文本
- * @param index 要保留的字符数量
- * @returns 格式化后的文本
+ * 前缀内容
  */
-const renderContent = (index: number): string => {
-  const prefixContent = state.contentChars.slice(0, index).join("");
-  const suffixContent = state.contentChars.slice(-index).join("");
+const prefixContent = computed(() =>
+  state.contentChars.slice(0, midIndex.value).join(""),
+);
 
-  switch (props.direction) {
-    case "start":
-      return `...${prefixContent}`;
-    case "end":
-      return `${suffixContent}...`;
-    case "middle":
-      return `${prefixContent}...${suffixContent}`;
-    default:
-      return "";
-  }
-};
+/**
+ * 后缀内容
+ */
+const suffixContent = computed(() =>
+  state.contentChars.slice(-midIndex.value).join(""),
+);
 
 /**
  * 开始测量流程
@@ -288,10 +300,6 @@ const cancelObserver = (): void => {
   mapItems.delete(element);
 };
 
-// const openAutoResize = (): void => {
-
-// }
-
 // 监听文本变化，重新初始化测量
 watch(
   () => props.text,
@@ -334,10 +342,6 @@ onMounted(() => {
     openObserver();
   } else {
     startMeasure();
-  }
-
-  if (props.autoResize) {
-    // openAutoResize();
   }
 });
 
