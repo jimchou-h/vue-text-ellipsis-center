@@ -1,6 +1,6 @@
-import { getCurrentScope as nt, onScopeDispose as rt, watch as H, computed as G, toValue as tt, shallowRef as ot, getCurrentInstance as it, onMounted as et, defineComponent as st, useTemplateRef as C, reactive as ut, nextTick as M, onBeforeUnmount as at, createElementBlock as A, openBlock as O, normalizeStyle as k, createCommentVNode as N, createTextVNode as U, renderSlot as $, toDisplayString as F, Fragment as q } from "vue";
+import { getCurrentScope as nt, onScopeDispose as rt, watch as G, computed as H, toValue as tt, shallowRef as ot, getCurrentInstance as it, onMounted as et, defineComponent as st, useTemplateRef as L, reactive as ut, nextTick as U, onBeforeUnmount as at, createElementBlock as I, openBlock as _, normalizeStyle as B, createCommentVNode as V, createTextVNode as T, renderSlot as O, toDisplayString as E, Fragment as S } from "vue";
 var K = {}, Z;
-function ct() {
+function lt() {
   return Z || (Z = 1, function() {
     if (typeof window != "object")
       return;
@@ -16,7 +16,7 @@ function ct() {
       );
       return;
     }
-    function e(t) {
+    function n(t) {
       try {
         return t.defaultView && t.defaultView.frameElement || null;
       } catch {
@@ -24,74 +24,74 @@ function ct() {
       }
     }
     var a = function(t) {
-      for (var n = t, r = e(n); r; )
-        n = r.ownerDocument, r = e(n);
-      return n;
-    }(window.document), u = [], c = null, g = null;
-    function w(t) {
-      this.time = t.time, this.target = t.target, this.rootBounds = S(t.rootBounds), this.boundingClientRect = S(t.boundingClientRect), this.intersectionRect = S(t.intersectionRect || y()), this.isIntersecting = !!t.intersectionRect;
-      var n = this.boundingClientRect, r = n.width * n.height, i = this.intersectionRect, s = i.width * i.height;
+      for (var e = t, r = n(e); r; )
+        e = r.ownerDocument, r = n(e);
+      return e;
+    }(window.document), u = [], l = null, v = null;
+    function R(t) {
+      this.time = t.time, this.target = t.target, this.rootBounds = N(t.rootBounds), this.boundingClientRect = N(t.boundingClientRect), this.intersectionRect = N(t.intersectionRect || k()), this.isIntersecting = !!t.intersectionRect;
+      var e = this.boundingClientRect, r = e.width * e.height, i = this.intersectionRect, s = i.width * i.height;
       r ? this.intersectionRatio = Number((s / r).toFixed(4)) : this.intersectionRatio = this.isIntersecting ? 1 : 0;
     }
-    function l(t, n) {
-      var r = n || {};
+    function c(t, e) {
+      var r = e || {};
       if (typeof t != "function")
         throw new Error("callback must be a function");
       if (r.root && r.root.nodeType != 1 && r.root.nodeType != 9)
         throw new Error("root must be a Document or Element");
-      this._checkForIntersections = R(
+      this._checkForIntersections = x(
         this._checkForIntersections.bind(this),
         this.THROTTLE_TIMEOUT
       ), this._callback = t, this._observationTargets = [], this._queuedEntries = [], this._rootMarginValues = this._parseRootMargin(r.rootMargin), this.thresholds = this._initThresholds(r.threshold), this.root = r.root || null, this.rootMargin = this._rootMarginValues.map(function(i) {
         return i.value + i.unit;
       }).join(" "), this._monitoringDocuments = [], this._monitoringUnsubscribes = [];
     }
-    l.prototype.THROTTLE_TIMEOUT = 100, l.prototype.POLL_INTERVAL = null, l.prototype.USE_MUTATION_OBSERVER = !0, l._setupCrossOriginUpdater = function() {
-      return c || (c = function(t, n) {
-        !t || !n ? g = y() : g = h(t, n), u.forEach(function(r) {
+    c.prototype.THROTTLE_TIMEOUT = 100, c.prototype.POLL_INTERVAL = null, c.prototype.USE_MUTATION_OBSERVER = !0, c._setupCrossOriginUpdater = function() {
+      return l || (l = function(t, e) {
+        !t || !e ? v = k() : v = F(t, e), u.forEach(function(r) {
           r._checkForIntersections();
         });
-      }), c;
-    }, l._resetCrossOriginUpdater = function() {
-      c = null, g = null;
-    }, l.prototype.observe = function(t) {
-      var n = this._observationTargets.some(function(r) {
+      }), l;
+    }, c._resetCrossOriginUpdater = function() {
+      l = null, v = null;
+    }, c.prototype.observe = function(t) {
+      var e = this._observationTargets.some(function(r) {
         return r.element == t;
       });
-      if (!n) {
+      if (!e) {
         if (!(t && t.nodeType == 1))
           throw new Error("target must be an Element");
         this._registerInstance(), this._observationTargets.push({ element: t, entry: null }), this._monitorIntersections(t.ownerDocument), this._checkForIntersections();
       }
-    }, l.prototype.unobserve = function(t) {
-      this._observationTargets = this._observationTargets.filter(function(n) {
-        return n.element != t;
+    }, c.prototype.unobserve = function(t) {
+      this._observationTargets = this._observationTargets.filter(function(e) {
+        return e.element != t;
       }), this._unmonitorIntersections(t.ownerDocument), this._observationTargets.length == 0 && this._unregisterInstance();
-    }, l.prototype.disconnect = function() {
+    }, c.prototype.disconnect = function() {
       this._observationTargets = [], this._unmonitorAllIntersections(), this._unregisterInstance();
-    }, l.prototype.takeRecords = function() {
+    }, c.prototype.takeRecords = function() {
       var t = this._queuedEntries.slice();
       return this._queuedEntries = [], t;
-    }, l.prototype._initThresholds = function(t) {
-      var n = t || [0];
-      return Array.isArray(n) || (n = [n]), n.sort().filter(function(r, i, s) {
+    }, c.prototype._initThresholds = function(t) {
+      var e = t || [0];
+      return Array.isArray(e) || (e = [e]), e.sort().filter(function(r, i, s) {
         if (typeof r != "number" || isNaN(r) || r < 0 || r > 1)
           throw new Error("threshold must be a number between 0 and 1 inclusively");
         return r !== s[i - 1];
       });
-    }, l.prototype._parseRootMargin = function(t) {
-      var n = t || "0px", r = n.split(/\s+/).map(function(i) {
+    }, c.prototype._parseRootMargin = function(t) {
+      var e = t || "0px", r = e.split(/\s+/).map(function(i) {
         var s = /^(-?\d*\.?\d+)(px|%)$/.exec(i);
         if (!s)
           throw new Error("rootMargin must be specified in pixels or percent");
         return { value: parseFloat(s[1]), unit: s[2] };
       });
       return r[1] = r[1] || r[0], r[2] = r[2] || r[0], r[3] = r[3] || r[1], r;
-    }, l.prototype._monitorIntersections = function(t) {
-      var n = t.defaultView;
-      if (n && this._monitoringDocuments.indexOf(t) == -1) {
+    }, c.prototype._monitorIntersections = function(t) {
+      var e = t.defaultView;
+      if (e && this._monitoringDocuments.indexOf(t) == -1) {
         var r = this._checkForIntersections, i = null, s = null;
-        this.POLL_INTERVAL ? i = n.setInterval(r, this.POLL_INTERVAL) : (T(n, "resize", r, !0), T(t, "scroll", r, !0), this.USE_MUTATION_OBSERVER && "MutationObserver" in n && (s = new n.MutationObserver(r), s.observe(t, {
+        this.POLL_INTERVAL ? i = e.setInterval(r, this.POLL_INTERVAL) : (b(e, "resize", r, !0), b(t, "scroll", r, !0), this.USE_MUTATION_OBSERVER && "MutationObserver" in e && (s = new e.MutationObserver(r), s.observe(t, {
           attributes: !0,
           childList: !0,
           characterData: !0,
@@ -102,81 +102,81 @@ function ct() {
         });
         var d = this.root && (this.root.ownerDocument || this.root) || a;
         if (t != d) {
-          var f = e(t);
-          f && this._monitorIntersections(f.ownerDocument);
+          var h = n(t);
+          h && this._monitorIntersections(h.ownerDocument);
         }
       }
-    }, l.prototype._unmonitorIntersections = function(t) {
-      var n = this._monitoringDocuments.indexOf(t);
-      if (n != -1) {
-        var r = this.root && (this.root.ownerDocument || this.root) || a, i = this._observationTargets.some(function(f) {
-          var p = f.element.ownerDocument;
+    }, c.prototype._unmonitorIntersections = function(t) {
+      var e = this._monitoringDocuments.indexOf(t);
+      if (e != -1) {
+        var r = this.root && (this.root.ownerDocument || this.root) || a, i = this._observationTargets.some(function(h) {
+          var p = h.element.ownerDocument;
           if (p == t)
             return !0;
           for (; p && p != r; ) {
-            var I = e(p);
-            if (p = I && I.ownerDocument, p == t)
+            var w = n(p);
+            if (p = w && w.ownerDocument, p == t)
               return !0;
           }
           return !1;
         });
         if (!i) {
-          var s = this._monitoringUnsubscribes[n];
-          if (this._monitoringDocuments.splice(n, 1), this._monitoringUnsubscribes.splice(n, 1), s(), t != r) {
-            var d = e(t);
+          var s = this._monitoringUnsubscribes[e];
+          if (this._monitoringDocuments.splice(e, 1), this._monitoringUnsubscribes.splice(e, 1), s(), t != r) {
+            var d = n(t);
             d && this._unmonitorIntersections(d.ownerDocument);
           }
         }
       }
-    }, l.prototype._unmonitorAllIntersections = function() {
+    }, c.prototype._unmonitorAllIntersections = function() {
       var t = this._monitoringUnsubscribes.slice(0);
       this._monitoringDocuments.length = 0, this._monitoringUnsubscribes.length = 0;
-      for (var n = 0; n < t.length; n++)
-        t[n]();
-    }, l.prototype._checkForIntersections = function() {
-      if (!(!this.root && c && !g)) {
-        var t = this._rootIsInDom(), n = t ? this._getRootRect() : y();
+      for (var e = 0; e < t.length; e++)
+        t[e]();
+    }, c.prototype._checkForIntersections = function() {
+      if (!(!this.root && l && !v)) {
+        var t = this._rootIsInDom(), e = t ? this._getRootRect() : k();
         this._observationTargets.forEach(function(r) {
-          var i = r.element, s = D(i), d = this._rootContainsTarget(i), f = r.entry, p = t && d && this._computeTargetAndRootIntersection(i, s, n), I = null;
-          this._rootContainsTarget(i) ? (!c || this.root) && (I = n) : I = y();
-          var E = r.entry = new w({
+          var i = r.element, s = M(i), d = this._rootContainsTarget(i), h = r.entry, p = t && d && this._computeTargetAndRootIntersection(i, s, e), w = null;
+          this._rootContainsTarget(i) ? (!l || this.root) && (w = e) : w = k();
+          var D = r.entry = new R({
             time: o(),
             target: i,
             boundingClientRect: s,
-            rootBounds: I,
+            rootBounds: w,
             intersectionRect: p
           });
-          f ? t && d ? this._hasCrossedThreshold(f, E) && this._queuedEntries.push(E) : f && f.isIntersecting && this._queuedEntries.push(E) : this._queuedEntries.push(E);
+          h ? t && d ? this._hasCrossedThreshold(h, D) && this._queuedEntries.push(D) : h && h.isIntersecting && this._queuedEntries.push(D) : this._queuedEntries.push(D);
         }, this), this._queuedEntries.length && this._callback(this.takeRecords(), this);
       }
-    }, l.prototype._computeTargetAndRootIntersection = function(t, n, r) {
+    }, c.prototype._computeTargetAndRootIntersection = function(t, e, r) {
       if (window.getComputedStyle(t).display != "none") {
-        for (var i = n, s = v(t), d = !1; !d && s; ) {
-          var f = null, p = s.nodeType == 1 ? window.getComputedStyle(s) : {};
+        for (var i = e, s = g(t), d = !1; !d && s; ) {
+          var h = null, p = s.nodeType == 1 ? window.getComputedStyle(s) : {};
           if (p.display == "none") return null;
           if (s == this.root || s.nodeType == /* DOCUMENT */
           9)
             if (d = !0, s == this.root || s == a)
-              c && !this.root ? !g || g.width == 0 && g.height == 0 ? (s = null, f = null, i = null) : f = g : f = r;
+              l && !this.root ? !v || v.width == 0 && v.height == 0 ? (s = null, h = null, i = null) : h = v : h = r;
             else {
-              var I = v(s), E = I && D(I), W = I && this._computeTargetAndRootIntersection(I, E, r);
-              E && W ? (s = I, f = h(E, W)) : (s = null, i = null);
+              var w = g(s), D = w && M(w), z = w && this._computeTargetAndRootIntersection(w, D, r);
+              D && z ? (s = w, h = F(D, z)) : (s = null, i = null);
             }
           else {
-            var z = s.ownerDocument;
-            s != z.body && s != z.documentElement && p.overflow != "visible" && (f = D(s));
+            var q = s.ownerDocument;
+            s != q.body && s != q.documentElement && p.overflow != "visible" && (h = M(s));
           }
-          if (f && (i = b(f, i)), !i) break;
-          s = s && v(s);
+          if (h && (i = y(h, i)), !i) break;
+          s = s && g(s);
         }
         return i;
       }
-    }, l.prototype._getRootRect = function() {
+    }, c.prototype._getRootRect = function() {
       var t;
-      if (this.root && !L(this.root))
-        t = D(this.root);
+      if (this.root && !A(this.root))
+        t = M(this.root);
       else {
-        var n = L(this.root) ? this.root : a, r = n.documentElement, i = n.body;
+        var e = A(this.root) ? this.root : a, r = e.documentElement, i = e.body;
         t = {
           top: 0,
           left: 0,
@@ -187,79 +187,79 @@ function ct() {
         };
       }
       return this._expandRectByRootMargin(t);
-    }, l.prototype._expandRectByRootMargin = function(t) {
-      var n = this._rootMarginValues.map(function(i, s) {
+    }, c.prototype._expandRectByRootMargin = function(t) {
+      var e = this._rootMarginValues.map(function(i, s) {
         return i.unit == "px" ? i.value : i.value * (s % 2 ? t.width : t.height) / 100;
       }), r = {
-        top: t.top - n[0],
-        right: t.right + n[1],
-        bottom: t.bottom + n[2],
-        left: t.left - n[3]
+        top: t.top - e[0],
+        right: t.right + e[1],
+        bottom: t.bottom + e[2],
+        left: t.left - e[3]
       };
       return r.width = r.right - r.left, r.height = r.bottom - r.top, r;
-    }, l.prototype._hasCrossedThreshold = function(t, n) {
-      var r = t && t.isIntersecting ? t.intersectionRatio || 0 : -1, i = n.isIntersecting ? n.intersectionRatio || 0 : -1;
+    }, c.prototype._hasCrossedThreshold = function(t, e) {
+      var r = t && t.isIntersecting ? t.intersectionRatio || 0 : -1, i = e.isIntersecting ? e.intersectionRatio || 0 : -1;
       if (r !== i)
         for (var s = 0; s < this.thresholds.length; s++) {
           var d = this.thresholds[s];
           if (d == r || d == i || d < r != d < i)
             return !0;
         }
-    }, l.prototype._rootIsInDom = function() {
-      return !this.root || _(a, this.root);
-    }, l.prototype._rootContainsTarget = function(t) {
-      var n = this.root && (this.root.ownerDocument || this.root) || a;
-      return _(n, t) && (!this.root || n == t.ownerDocument);
-    }, l.prototype._registerInstance = function() {
+    }, c.prototype._rootIsInDom = function() {
+      return !this.root || f(a, this.root);
+    }, c.prototype._rootContainsTarget = function(t) {
+      var e = this.root && (this.root.ownerDocument || this.root) || a;
+      return f(e, t) && (!this.root || e == t.ownerDocument);
+    }, c.prototype._registerInstance = function() {
       u.indexOf(this) < 0 && u.push(this);
-    }, l.prototype._unregisterInstance = function() {
+    }, c.prototype._unregisterInstance = function() {
       var t = u.indexOf(this);
       t != -1 && u.splice(t, 1);
     };
     function o() {
       return window.performance && performance.now && performance.now();
     }
-    function R(t, n) {
+    function x(t, e) {
       var r = null;
       return function() {
         r || (r = setTimeout(function() {
           t(), r = null;
-        }, n));
+        }, e));
       };
     }
-    function T(t, n, r, i) {
-      typeof t.addEventListener == "function" ? t.addEventListener(n, r, i) : typeof t.attachEvent == "function" && t.attachEvent("on" + n, r);
+    function b(t, e, r, i) {
+      typeof t.addEventListener == "function" ? t.addEventListener(e, r, i) : typeof t.attachEvent == "function" && t.attachEvent("on" + e, r);
     }
-    function m(t, n, r, i) {
-      typeof t.removeEventListener == "function" ? t.removeEventListener(n, r, i) : typeof t.detachEvent == "function" && t.detachEvent("on" + n, r);
+    function m(t, e, r, i) {
+      typeof t.removeEventListener == "function" ? t.removeEventListener(e, r, i) : typeof t.detachEvent == "function" && t.detachEvent("on" + e, r);
     }
-    function b(t, n) {
-      var r = Math.max(t.top, n.top), i = Math.min(t.bottom, n.bottom), s = Math.max(t.left, n.left), d = Math.min(t.right, n.right), f = d - s, p = i - r;
-      return f >= 0 && p >= 0 && {
+    function y(t, e) {
+      var r = Math.max(t.top, e.top), i = Math.min(t.bottom, e.bottom), s = Math.max(t.left, e.left), d = Math.min(t.right, e.right), h = d - s, p = i - r;
+      return h >= 0 && p >= 0 && {
         top: r,
         bottom: i,
         left: s,
         right: d,
-        width: f,
+        width: h,
         height: p
       } || null;
     }
-    function D(t) {
-      var n;
+    function M(t) {
+      var e;
       try {
-        n = t.getBoundingClientRect();
+        e = t.getBoundingClientRect();
       } catch {
       }
-      return n ? (n.width && n.height || (n = {
-        top: n.top,
-        right: n.right,
-        bottom: n.bottom,
-        left: n.left,
-        width: n.right - n.left,
-        height: n.bottom - n.top
-      }), n) : y();
+      return e ? (e.width && e.height || (e = {
+        top: e.top,
+        right: e.right,
+        bottom: e.bottom,
+        left: e.left,
+        width: e.right - e.left,
+        height: e.bottom - e.top
+      }), e) : k();
     }
-    function y() {
+    function k() {
       return {
         top: 0,
         bottom: 0,
@@ -269,7 +269,7 @@ function ct() {
         height: 0
       };
     }
-    function S(t) {
+    function N(t) {
       return !t || "x" in t ? t : {
         top: t.top,
         y: t.top,
@@ -281,149 +281,149 @@ function ct() {
         height: t.height
       };
     }
-    function h(t, n) {
-      var r = n.top - t.top, i = n.left - t.left;
+    function F(t, e) {
+      var r = e.top - t.top, i = e.left - t.left;
       return {
         top: r,
         left: i,
-        height: n.height,
-        width: n.width,
-        bottom: r + n.height,
-        right: i + n.width
+        height: e.height,
+        width: e.width,
+        bottom: r + e.height,
+        right: i + e.width
       };
     }
-    function _(t, n) {
-      for (var r = n; r; ) {
+    function f(t, e) {
+      for (var r = e; r; ) {
         if (r == t) return !0;
-        r = v(r);
+        r = g(r);
       }
       return !1;
     }
-    function v(t) {
-      var n = t.parentNode;
+    function g(t) {
+      var e = t.parentNode;
       return t.nodeType == /* DOCUMENT */
-      9 && t != a ? e(t) : (n && n.assignedSlot && (n = n.assignedSlot.parentNode), n && n.nodeType == 11 && n.host ? n.host : n);
+      9 && t != a ? n(t) : (e && e.assignedSlot && (e = e.assignedSlot.parentNode), e && e.nodeType == 11 && e.host ? e.host : e);
     }
-    function L(t) {
+    function A(t) {
       return t && t.nodeType === 9;
     }
-    window.IntersectionObserver = l, window.IntersectionObserverEntry = w;
+    window.IntersectionObserver = c, window.IntersectionObserverEntry = R;
   }()), K;
 }
-ct();
-let B = null;
-const V = /* @__PURE__ */ new Map();
-function lt(e) {
-  e.forEach((a) => {
-    const u = V.get(a.target);
+lt();
+let P = null;
+const W = /* @__PURE__ */ new Map();
+function ct(n) {
+  n.forEach((a) => {
+    const u = W.get(a.target);
     u && u(a);
   });
 }
 function j() {
-  return B || (B = new IntersectionObserver(lt)), B;
+  return P || (P = new IntersectionObserver(ct)), P;
 }
 var J;
-(function(e) {
-  e[e.HIGH_SURROGATE_START = 55296] = "HIGH_SURROGATE_START", e[e.HIGH_SURROGATE_END = 56319] = "HIGH_SURROGATE_END", e[e.LOW_SURROGATE_START = 56320] = "LOW_SURROGATE_START", e[e.REGIONAL_INDICATOR_START = 127462] = "REGIONAL_INDICATOR_START", e[e.REGIONAL_INDICATOR_END = 127487] = "REGIONAL_INDICATOR_END", e[e.FITZPATRICK_MODIFIER_START = 127995] = "FITZPATRICK_MODIFIER_START", e[e.FITZPATRICK_MODIFIER_END = 127999] = "FITZPATRICK_MODIFIER_END", e[e.VARIATION_MODIFIER_START = 65024] = "VARIATION_MODIFIER_START", e[e.VARIATION_MODIFIER_END = 65039] = "VARIATION_MODIFIER_END", e[e.DIACRITICAL_MARKS_START = 8400] = "DIACRITICAL_MARKS_START", e[e.DIACRITICAL_MARKS_END = 8447] = "DIACRITICAL_MARKS_END", e[e.SUBDIVISION_INDICATOR_START = 127988] = "SUBDIVISION_INDICATOR_START", e[e.TAGS_START = 917504] = "TAGS_START", e[e.TAGS_END = 917631] = "TAGS_END", e[e.ZWJ = 8205] = "ZWJ";
+(function(n) {
+  n[n.HIGH_SURROGATE_START = 55296] = "HIGH_SURROGATE_START", n[n.HIGH_SURROGATE_END = 56319] = "HIGH_SURROGATE_END", n[n.LOW_SURROGATE_START = 56320] = "LOW_SURROGATE_START", n[n.REGIONAL_INDICATOR_START = 127462] = "REGIONAL_INDICATOR_START", n[n.REGIONAL_INDICATOR_END = 127487] = "REGIONAL_INDICATOR_END", n[n.FITZPATRICK_MODIFIER_START = 127995] = "FITZPATRICK_MODIFIER_START", n[n.FITZPATRICK_MODIFIER_END = 127999] = "FITZPATRICK_MODIFIER_END", n[n.VARIATION_MODIFIER_START = 65024] = "VARIATION_MODIFIER_START", n[n.VARIATION_MODIFIER_END = 65039] = "VARIATION_MODIFIER_END", n[n.DIACRITICAL_MARKS_START = 8400] = "DIACRITICAL_MARKS_START", n[n.DIACRITICAL_MARKS_END = 8447] = "DIACRITICAL_MARKS_END", n[n.SUBDIVISION_INDICATOR_START = 127988] = "SUBDIVISION_INDICATOR_START", n[n.TAGS_START = 917504] = "TAGS_START", n[n.TAGS_END = 917631] = "TAGS_END", n[n.ZWJ = 8205] = "ZWJ";
 })(J || (J = {}));
-const ht = Object.freeze([776, 2359, 2367, 2984, 3007, 3021, 3633, 3635, 3648, 3657, 4352, 4449, 4520]);
+const ft = Object.freeze([776, 2359, 2367, 2984, 3007, 3021, 3633, 3635, 3648, 3657, 4352, 4449, 4520]);
 var Q;
-function ft(e) {
-  if (typeof e != "string") throw new TypeError("string cannot be undefined or null");
+function ht(n) {
+  if (typeof n != "string") throw new TypeError("string cannot be undefined or null");
   const a = [];
-  let u = 0, c = 0;
-  for (; u < e.length; ) c += dt(u + c, e), wt(e[u + c]) && c++, _t(e[u + c]) && c++, mt(e[u + c]) && c++, Rt(e[u + c]) ? c++ : (a.push(e.substring(u, u + c)), u += c, c = 0);
+  let u = 0, l = 0;
+  for (; u < n.length; ) l += dt(u + l, n), wt(n[u + l]) && l++, mt(n[u + l]) && l++, It(n[u + l]) && l++, Rt(n[u + l]) ? l++ : (a.push(n.substring(u, u + l)), u += l, l = 0);
   return a;
 }
-function dt(e, a) {
-  const u = a[e];
-  if (!pt(u) || e === a.length - 1) return 1;
-  const c = u + a[e + 1];
-  let g = a.substring(e + 2, e + 5);
-  return X(c) && X(g) ? 4 : gt(c) && It(g) ? a.slice(e).indexOf(String.fromCodePoint(917631)) + 2 : vt(g) ? 4 : 2;
+function dt(n, a) {
+  const u = a[n];
+  if (!pt(u) || n === a.length - 1) return 1;
+  const l = u + a[n + 1];
+  let v = a.substring(n + 2, n + 5);
+  return X(l) && X(v) ? 4 : vt(l) && _t(v) ? a.slice(n).indexOf(String.fromCodePoint(917631)) + 2 : gt(v) ? 4 : 2;
 }
-function pt(e) {
-  return e && x(e[0].charCodeAt(0), 55296, 56319);
+function pt(n) {
+  return n && C(n[0].charCodeAt(0), 55296, 56319);
 }
-function X(e) {
-  return x(P(e), 127462, 127487);
+function X(n) {
+  return C($(n), 127462, 127487);
 }
-function gt(e) {
-  return x(P(e), 127988, 127988);
+function vt(n) {
+  return C($(n), 127988, 127988);
 }
-function vt(e) {
-  return x(P(e), 127995, 127999);
+function gt(n) {
+  return C($(n), 127995, 127999);
 }
-function _t(e) {
-  return typeof e == "string" && x(e.charCodeAt(0), 65024, 65039);
+function mt(n) {
+  return typeof n == "string" && C(n.charCodeAt(0), 65024, 65039);
 }
-function mt(e) {
-  return typeof e == "string" && x(e.charCodeAt(0), 8400, 8447);
+function It(n) {
+  return typeof n == "string" && C(n.charCodeAt(0), 8400, 8447);
 }
-function It(e) {
-  const a = e.codePointAt(0);
-  return typeof e == "string" && typeof a == "number" && x(a, 917504, 917631);
+function _t(n) {
+  const a = n.codePointAt(0);
+  return typeof n == "string" && typeof a == "number" && C(a, 917504, 917631);
 }
-function wt(e) {
-  return typeof e == "string" && ht.includes(e.charCodeAt(0));
+function wt(n) {
+  return typeof n == "string" && ft.includes(n.charCodeAt(0));
 }
-function Rt(e) {
-  return typeof e == "string" && e.charCodeAt(0) === 8205;
+function Rt(n) {
+  return typeof n == "string" && n.charCodeAt(0) === 8205;
 }
-function P(e) {
-  return (e.charCodeAt(0) - 55296 << 10) + (e.charCodeAt(1) - 56320) + 65536;
+function $(n) {
+  return (n.charCodeAt(0) - 55296 << 10) + (n.charCodeAt(1) - 56320) + 65536;
 }
-function x(e, a, u) {
-  return e >= a && e <= u;
+function C(n, a, u) {
+  return n >= a && n <= u;
 }
-(function(e) {
-  e[e.unit_1 = 1] = "unit_1", e[e.unit_2 = 2] = "unit_2", e[e.unit_4 = 4] = "unit_4";
+(function(n) {
+  n[n.unit_1 = 1] = "unit_1", n[n.unit_2 = 2] = "unit_2", n[n.unit_4 = 4] = "unit_4";
 })(Q || (Q = {}));
-function Tt(e, a) {
-  return nt() ? (rt(e, a), !0) : !1;
+function Tt(n, a) {
+  return nt() ? (rt(n, a), !0) : !1;
 }
 const bt = typeof window < "u" && typeof document < "u";
 typeof WorkerGlobalScope < "u" && globalThis instanceof WorkerGlobalScope;
 const yt = bt ? window : void 0;
-function Y(e) {
+function Y(n) {
   var a;
-  const u = tt(e);
+  const u = tt(n);
   return (a = u == null ? void 0 : u.$el) !== null && a !== void 0 ? a : u;
 }
 // @__NO_SIDE_EFFECTS__
 function Et() {
-  const e = ot(!1), a = it();
+  const n = ot(!1), a = it();
   return a && et(() => {
-    e.value = !0;
-  }, a), e;
+    n.value = !0;
+  }, a), n;
 }
 // @__NO_SIDE_EFFECTS__
-function At(e) {
+function At(n) {
   const a = /* @__PURE__ */ Et();
-  return G(() => (a.value, !!e()));
+  return H(() => (a.value, !!n()));
 }
-function Ot(e, a, u = {}) {
-  const { window: c = yt, ...g } = u;
-  let w;
-  const l = /* @__PURE__ */ At(() => c && "ResizeObserver" in c), o = () => {
-    w && (w.disconnect(), w = void 0);
-  }, R = H(G(() => {
-    const m = tt(e);
-    return Array.isArray(m) ? m.map((b) => Y(b)) : [Y(m)];
+function Ot(n, a, u = {}) {
+  const { window: l = yt, ...v } = u;
+  let R;
+  const c = /* @__PURE__ */ At(() => l && "ResizeObserver" in l), o = () => {
+    R && (R.disconnect(), R = void 0);
+  }, x = G(H(() => {
+    const m = tt(n);
+    return Array.isArray(m) ? m.map((y) => Y(y)) : [Y(m)];
   }), (m) => {
-    if (o(), l.value && c) {
-      w = new ResizeObserver(a);
-      for (const b of m) b && w.observe(b, g);
+    if (o(), c.value && l) {
+      R = new ResizeObserver(a);
+      for (const y of m) y && R.observe(y, v);
     }
   }, {
     immediate: !0,
     flush: "post"
-  }), T = () => {
-    o(), R();
+  }), b = () => {
+    o(), x();
   };
-  return Tt(T), {
-    isSupported: l,
-    stop: T
+  return Tt(b), {
+    isSupported: c,
+    stop: b
   };
 }
 const xt = {
@@ -440,10 +440,10 @@ const xt = {
     autoResize: { type: Boolean, default: !0 }
   },
   emits: ["update:expanded"],
-  setup(e, { emit: a }) {
-    const u = e, c = C("containerRef"), g = C("fullMeasureRef"), w = C("singleRowMeasureRef"), l = C("midMeasureRef");
-    Ot(c, () => {
-      o.status = 0, m();
+  setup(n, { emit: a }) {
+    const u = n, l = L("containerRef"), v = L("fullMeasureRef"), R = L("singleRowMeasureRef"), c = L("midMeasureRef");
+    Ot(l, () => {
+      o.status = 0, y();
     });
     const o = ut({
       contentChars: [],
@@ -462,34 +462,26 @@ const xt = {
         fontSize: "inherit"
       },
       init: !1
-    }), R = G(() => Math.ceil((o.walkingIndexes[0] + o.walkingIndexes[1]) / 2)), T = (h) => {
-      const _ = o.contentChars.slice(0, h).join(""), v = o.contentChars.slice(-h).join("");
-      switch (u.direction) {
-        case "start":
-          return `...${_}`;
-        case "end":
-          return `${v}...`;
-        case "middle":
-          return `${_}...${v}`;
-        default:
-          return "";
-      }
-    }, m = () => {
+    }), x = H(() => Math.ceil((o.walkingIndexes[0] + o.walkingIndexes[1]) / 2)), b = H(
+      () => o.contentChars.slice(0, x.value).join("")
+    ), m = H(
+      () => o.contentChars.slice(-x.value).join("")
+    ), y = () => {
       o.status = 1, o.walkingIndexes = [
         0,
         u.direction === "middle" ? Math.ceil(o.contentChars.length / 2) : o.contentChars.length
       ];
-    }, b = async () => {
-      var h, _;
+    }, M = async () => {
+      var f, g;
       if (o.status === 1) {
-        const v = ((h = g.value) == null ? void 0 : h.offsetHeight) ?? 0, t = (((_ = w.value) == null ? void 0 : _.offsetHeight) ?? 0) * u.rows;
-        v <= t ? o.status = 100 : (o.maxHeight = t, o.status = 2);
+        const A = ((f = v.value) == null ? void 0 : f.offsetHeight) ?? 0, e = (((g = R.value) == null ? void 0 : g.offsetHeight) ?? 0) * u.rows;
+        A <= e ? o.status = 100 : (o.maxHeight = e, o.status = 2);
       }
-    }, D = async () => {
-      var h;
+    }, k = async () => {
+      var f;
       if (o.status === 2) {
-        const _ = o.walkingIndexes[1] - o.walkingIndexes[0], v = ((h = l.value) == null ? void 0 : h.offsetHeight) ?? 0;
-        _ > 1 ? v > o.maxHeight ? o.walkingIndexes = [o.walkingIndexes[0], R.value] : o.walkingIndexes = [R.value, o.walkingIndexes[1]] : (v > o.maxHeight ? o.walkingIndexes = [
+        const g = o.walkingIndexes[1] - o.walkingIndexes[0], A = ((f = c.value) == null ? void 0 : f.offsetHeight) ?? 0;
+        g > 1 ? A > o.maxHeight ? o.walkingIndexes = [o.walkingIndexes[0], x.value] : o.walkingIndexes = [x.value, o.walkingIndexes[1]] : (A > o.maxHeight ? o.walkingIndexes = [
           o.walkingIndexes[0],
           o.walkingIndexes[0]
         ] : o.walkingIndexes = [
@@ -497,86 +489,111 @@ const xt = {
           o.walkingIndexes[1]
         ], o.status = 99);
       }
-    }, y = async () => {
-      await M();
-      const h = c.value;
-      if (!h) return;
-      j().observe(h), V.set(h, (v) => {
-        if (v.isIntersecting) {
+    }, N = async () => {
+      await U();
+      const f = l.value;
+      if (!f) return;
+      j().observe(f), W.set(f, (A) => {
+        if (A.isIntersecting) {
           if (o.init) return;
-          m(), o.status = 1, o.init = !0;
+          y(), o.status = 1, o.init = !0;
         }
       });
-    }, S = () => {
-      const h = c.value;
-      if (!h) return;
-      j().unobserve(h), V.delete(h);
+    }, F = () => {
+      const f = l.value;
+      if (!f) return;
+      j().unobserve(f), W.delete(f);
     };
-    return H(
+    return G(
       () => u.text,
-      async (h) => {
-        o.contentChars = ft(h), o.init && (o.init = !1, S(), await M(), y());
+      async (f) => {
+        o.contentChars = ht(f), o.init && (o.init = !1, F(), await U(), N());
       },
       { immediate: !0 }
-    ), H(
+    ), G(
       () => o.status,
       async () => {
-        await M(), b();
+        await U(), M();
       }
-    ), H([() => o.status, () => o.walkingIndexes], () => {
-      o.status === 2 && M(() => {
-        D();
+    ), G([() => o.status, () => o.walkingIndexes], () => {
+      o.status === 2 && U(() => {
+        k();
       });
     }), et(() => {
-      u.useObserver ? (o.status = 0, y()) : m(), u.autoResize;
+      u.useObserver ? (o.status = 0, N()) : y();
     }), at(() => {
-      u.useObserver && S();
-    }), (h, _) => (O(), A("div", {
+      u.useObserver && F();
+    }), (f, g) => (_(), I("div", {
       ref_key: "containerRef",
-      ref: c,
-      style: k(o.containerStyle)
+      ref: l,
+      style: B(o.containerStyle)
     }, [
-      o.status === 1 ? (O(), A("div", {
+      o.status === 1 ? (_(), I("div", {
         key: 0,
         ref_key: "fullMeasureRef",
-        ref: g,
-        style: k(o.measureStyle),
+        ref: v,
+        style: B(o.measureStyle),
         "aria-hidden": "true"
       }, [
-        U(F(u.text) + " ", 1),
-        $(h.$slots, "expandNode")
-      ], 4)) : N("", !0),
-      o.status === 1 ? (O(), A("div", {
+        T(E(u.text) + " ", 1),
+        O(f.$slots, "expandNode")
+      ], 4)) : V("", !0),
+      o.status === 1 ? (_(), I("div", {
         key: 1,
         ref_key: "singleRowMeasureRef",
-        ref: w,
-        style: k(o.measureStyle),
+        ref: R,
+        style: B(o.measureStyle),
         "aria-hidden": "true"
-      }, "   ", 4)) : N("", !0),
-      o.status === 2 ? (O(), A("div", {
+      }, [
+        g[0] || (g[0] = T("  ", -1)),
+        O(f.$slots, "expandNode")
+      ], 4)) : V("", !0),
+      o.status === 2 ? (_(), I("div", {
         key: 2,
         ref_key: "midMeasureRef",
-        ref: l,
-        style: k([o.measureStyle, { "word-break": "break-all" }]),
+        ref: c,
+        style: B([o.measureStyle, { "word-break": "break-all" }]),
         "aria-hidden": "true"
-      }, F(T(R.value)), 5)) : (O(), A("div", xt, [
-        u.expanded || o.status === 100 ? (O(), A(q, { key: 0 }, [
-          U(F(u.text) + " ", 1),
-          o.status === 99 ? $(h.$slots, "collapseNode", { key: 0 }) : N("", !0)
-        ], 64)) : o.status === 99 ? (O(), A(q, { key: 1 }, [
-          U(F(T(R.value)), 1)
-        ], 64)) : N("", !0)
+      }, [
+        u.direction === "start" ? (_(), I(S, { key: 0 }, [
+          O(f.$slots, "expandNode"),
+          T("..." + E(m.value), 1)
+        ], 64)) : u.direction === "end" ? (_(), I(S, { key: 1 }, [
+          T(E(b.value) + "...", 1),
+          O(f.$slots, "expandNode")
+        ], 64)) : (_(), I(S, { key: 2 }, [
+          T(E(b.value) + "...", 1),
+          O(f.$slots, "expandNode"),
+          T(E(m.value), 1)
+        ], 64))
+      ], 4)) : (_(), I("div", xt, [
+        u.expanded || o.status === 100 ? (_(), I(S, { key: 0 }, [
+          T(E(u.text) + " ", 1),
+          o.status === 99 ? O(f.$slots, "collapseNode", { key: 0 }) : V("", !0)
+        ], 64)) : o.status === 99 ? (_(), I(S, { key: 1 }, [
+          u.direction === "start" ? (_(), I(S, { key: 0 }, [
+            O(f.$slots, "expandNode"),
+            T("..." + E(m.value), 1)
+          ], 64)) : u.direction === "end" ? (_(), I(S, { key: 1 }, [
+            T(E(b.value) + "...", 1),
+            O(f.$slots, "expandNode")
+          ], 64)) : (_(), I(S, { key: 2 }, [
+            T(E(b.value) + "...", 1),
+            O(f.$slots, "expandNode"),
+            T(E(m.value), 1)
+          ], 64))
+        ], 64)) : V("", !0)
       ], 512))
     ], 4));
   }
 });
-function St(e) {
-  e.component("TextEllipsisCenter", Dt);
+function St(n) {
+  n.component("TextEllipsisCenter", Dt);
 }
-const Mt = {
+const Ct = {
   install: St
 };
 export {
   Dt as TextEllipsisCenter,
-  Mt as default
+  Ct as default
 };
