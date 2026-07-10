@@ -7,6 +7,7 @@ interface PackageJson {
   main?: string;
   module?: string;
   types?: string;
+  files?: string[];
   exports?: Record<string, { types?: string; import?: string; require?: string }>;
 }
 
@@ -35,6 +36,12 @@ describe("发布契约", () => {
     expect(exportsRoot.require).toBe("./dist/vue-text-ellipsis-center.umd.js");
     expect(exportsRoot.types).toBe("./dist/vue-text-ellipsis-center.es.d.ts");
     expect(exportsRoot.types?.endsWith(".d.ts")).toBe(true);
+  });
+
+  it("发布 files 必须包含包内 README.md", () => {
+    const pkg = readLibPackage();
+    expect(pkg.files).toContain("README.md");
+    expect(pkg.files).not.toContain("../README.md");
   });
 
   it("发布声明的入口文件必须指向构建产物目录", () => {

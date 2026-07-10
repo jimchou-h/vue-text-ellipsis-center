@@ -39,4 +39,13 @@ if (!pkg.peerDependenciesMeta?.["@vue/composition-api"]?.optional) {
   throw new Error("@vue/composition-api 必须声明为可选 peer 依赖");
 }
 
+if (!pkg.files?.includes("README.md")) {
+  throw new Error("发布包 files 必须包含 README.md");
+}
+
+const packageReadmePath = path.join(packageRoot, "README.md");
+if (!existsSync(packageReadmePath)) {
+  throw new Error("发布包缺少 src/README.md，请先执行 pnpm build");
+}
+
 console.log("Release contract OK");

@@ -6,7 +6,7 @@
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "init": "pnpm install",
-    "build": "vite build && node scripts/copy-compat-assets.mjs",
+    "build": "vite build && node scripts/copy-compat-assets.mjs && node scripts/copy-package-readme.mjs",
     "build:pages": "node scripts/build-pages.mjs",
     "prepare:compat": "pnpm build",
     "dev": "vite build && pnpm --filter vue-text-ellipsis-center-examples run dev",
