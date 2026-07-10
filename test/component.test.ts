@@ -1,39 +1,49 @@
 import { mount } from "@vue/test-utils";
-import { nextTick } from "vue";
-import TextEllipsisCenter from "../src/components/text-ellipsis-center.vue";
+import { defineComponent, nextTick, ref } from "vue";
+import TextEllipsisCenter from "../src/components/text-ellipsis-center";
 
-// 伪造 offsetHeight，用于控制“是否超出一行”
 Object.defineProperty(HTMLElement.prototype, "offsetHeight", {
   configurable: true,
-  value: 20, // 默认每行 20px
+  get() {
+    const measureType = this.getAttribute("data-measure");
+    const contentLength = this.textContent?.length ?? 0;
+
+    if (measureType === "single-row") return 20;
+    if (measureType === "full") return contentLength > 8 ? 40 : 20;
+    if (measureType === "mid") return contentLength > 8 ? 40 : 20;
+
+    return 20;
+  },
 });
 
-describe("TextEllipsisCenter.vue", () => {
-  it("正常挂载并渲染文本", async () => {
+async function waitForMeasure(): Promise<void> {
+  for (let index = 0; index < 12; index += 1) {
+    await nextTick();
+    await Promise.resolve();
+  }
+}
+
+describe("TextEllipsisCenter", () => {
+  afterEach(() => {
+    document.body.innerHTML = "";
+  });
+
+  it("组件正常挂载并渲染文本", async () => {
     const wrapper = mount(TextEllipsisCenter, {
       props: {
-        text: "Hello Vue Ellipsis",
+        text: "Hello",
         rows: 1,
       },
     });
+
+    await waitForMeasure();
+
     expect(wrapper.exists()).toBe(true);
-    await nextTick();
-    // 初始应进入 PREPARE 状态
-    expect((wrapper.vm as any).state.status).toBe(1); // MEASURE_STATUS.PREPARE
+    expect(wrapper.find('[data-container="text-ellipsis"]').exists()).toBe(true);
+    expect(wrapper.text()).toContain("Hello");
   });
 
-  it("当文本未超出行高时应为 STABLE_NO_ELLIPSIS", async () => {
-    const wrapper = mount(TextEllipsisCenter, {
-      props: { text: "short", rows: 2 },
-    });
-    const vm = wrapper.vm as any;
-    vm.fullMeasureRef = { value: { offsetHeight: 10 } };
-    vm.singleRowMeasureRef = { value: { offsetHeight: 20 } };
-    await (wrapper.vm as any).measureHeights();
-    expect((wrapper.vm as any).state.status).toBe(100); // STABLE_NO_ELLIPSIS
-  });
-
-  it('direction = "end" 正确渲染省略符和插槽', async () => {
+  it('direction = "end" 模式通过公开渲染结果展示前缀、省略符和插槽', async () => {
     const wrapper = mount(TextEllipsisCenter, {
       props: {
         text: "1234567890",
@@ -44,17 +54,15 @@ describe("TextEllipsisCenter.vue", () => {
       },
     });
 
-    // 强行进入最终省略状态
-    (wrapper.vm as any).state.status = 99; // STABLE_ELLIPSIS
-    (wrapper.vm as any).state.contentChars = [..."1234567890"];
-    await nextTick();
+    await waitForMeasure();
 
-    expect(wrapper.html()).toContain("123"); // 前缀
-    expect(wrapper.html()).toContain("..."); // 省略符
+    const html = wrapper.html();
+    expect(html).toContain("...");
     expect(wrapper.find('[data-test="slot"]').exists()).toBe(true);
+    expect(html.indexOf("...")).toBeLessThan(html.indexOf("[more]"));
   });
 
-  it('direction = "middle" 时插槽在中间', async () => {
+  it('direction = "middle" 时插槽位于前后文本之间', async () => {
     const wrapper = mount(TextEllipsisCenter, {
       props: {
         text: "abcdefghij",
@@ -64,12 +72,32 @@ describe("TextEllipsisCenter.vue", () => {
         expandNode: '<b data-test="mid">##</b>',
       },
     });
-    (wrapper.vm as any).state.status = 99; // STABLE_ELLIPSIS
-    (wrapper.vm as any).state.contentChars = [..."abcdefghij"];
-    await nextTick();
+
+    await waitForMeasure();
+
     const html = wrapper.html();
-    expect(html.indexOf("abc")).toBeLessThan(html.indexOf("##"));
-    expect(html.indexOf("##")).toBeLessThan(html.indexOf("hij"));
+    expect(html).toContain("...");
+    expect(html.indexOf("...")).toBeLessThan(html.indexOf("##"));
+    expect(wrapper.find('[data-test="mid"]').exists()).toBe(true);
+  });
+
+  it('direction = "start" 模式通过公开渲染结果展示插槽、省略符和后缀', async () => {
+    const wrapper = mount(TextEllipsisCenter, {
+      props: {
+        text: "abcdefghij",
+        direction: "start",
+      },
+      slots: {
+        expandNode: '<span data-test="start">[+]</span>',
+      },
+    });
+
+    await waitForMeasure();
+
+    const html = wrapper.html();
+    expect(html).toContain("[+]");
+    expect(html).toContain("...");
+    expect(html.indexOf("[+]")).toBeLessThan(html.indexOf("..."));
   });
 
   it("expanded = true 显示完整文本", async () => {
@@ -79,8 +107,130 @@ describe("TextEllipsisCenter.vue", () => {
         expanded: true,
       },
     });
-    (wrapper.vm as any).state.status = 99;
-    await nextTick();
+
+    await waitForMeasure();
+
     expect(wrapper.text()).toContain("longlongtext");
+  });
+
+  it("支持 collapseNode 插槽", async () => {
+    const wrapper = mount(TextEllipsisCenter, {
+      props: {
+        text: "这是一段需要触发省略的测试文本",
+        expanded: true,
+      },
+      slots: {
+        collapseNode: '<button data-test="collapse">收起</button>',
+      },
+    });
+
+    await waitForMeasure();
+
+    expect(wrapper.find('[data-test="collapse"]').exists()).toBe(true);
+  });
+
+  it("不同行数配置正常工作", async () => {
+    const wrapper = mount(TextEllipsisCenter, {
+      props: {
+        text: "多行文本测试",
+        rows: 3,
+      },
+    });
+
+    await waitForMeasure();
+
+    expect(wrapper.exists()).toBe(true);
+    expect(wrapper.text()).toContain("多行文本测试");
+  });
+
+  it("useObserver = true 时组件正常挂载", async () => {
+    const wrapper = mount(TextEllipsisCenter, {
+      props: {
+        text: "延迟加载文本",
+        useObserver: true,
+      },
+    });
+
+    await waitForMeasure();
+
+    expect(wrapper.exists()).toBe(true);
+    expect(wrapper.find('[data-container="text-ellipsis"]').exists()).toBe(true);
+  });
+
+  it("正确处理 Unicode 字符", async () => {
+    const wrapper = mount(TextEllipsisCenter, {
+      props: {
+        text: "👋🌍你好世界🚀",
+        rows: 1,
+      },
+    });
+
+    await waitForMeasure();
+
+    expect(wrapper.exists()).toBe(true);
+    expect(wrapper.text()).toContain("👋");
+    expect(wrapper.text()).toContain("🚀");
+  });
+
+  it("长文本应进入省略态并输出省略号", async () => {
+    const wrapper = mount(TextEllipsisCenter, {
+      props: {
+        text: "abcdefghijklmnop",
+        direction: "middle",
+        rows: 1,
+      },
+    });
+
+    await waitForMeasure();
+
+    expect(wrapper.text()).toContain("...");
+    expect(wrapper.find('[data-measure]').exists()).toBe(false);
+  });
+
+  it("未提供 expandNode 时不应渲染展开控件", async () => {
+    const wrapper = mount(TextEllipsisCenter, {
+      props: {
+        text: "abcdefghijklmnop",
+        direction: "middle",
+        rows: 1,
+      },
+    });
+
+    await waitForMeasure();
+
+    expect(wrapper.text()).toContain("...");
+    expect(wrapper.find("button").exists()).toBe(false);
+  });
+
+  it("v-show 隐藏时应延后测量，显示后完成省略", async () => {
+    const visible = ref(false);
+    const Host = defineComponent({
+      components: { TextEllipsisCenter },
+      setup() {
+        return { visible };
+      },
+      template: `
+        <div v-show="visible" style="width: 200px">
+          <TextEllipsisCenter
+            text="abcdefghijklmnop"
+            direction="middle"
+          />
+        </div>
+      `,
+    });
+
+    const wrapper = mount(Host);
+    const inner = wrapper.findComponent(TextEllipsisCenter);
+
+    await nextTick();
+    expect(inner.text()).not.toContain("...");
+
+    visible.value = true;
+    await nextTick();
+    window.dispatchEvent(new Event("resize"));
+    await waitForMeasure();
+
+    expect(inner.text()).toContain("...");
+    expect(inner.find('[data-measure]').exists()).toBe(false);
   });
 });

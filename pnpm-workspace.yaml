@@ -1,5 +1,6 @@
 packages:
+  - src
   - examples
 
-overrides:
-  vue-text-ellipsis-center: link:C:/Users/huangjingzhou/AppData/Local/pnpm/global/5/node_modules/vue-text-ellipsis-center
+ignoredBuiltDependencies:
+  - esbuild

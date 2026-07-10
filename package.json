@@ -1,63 +1,45 @@
 {
-  "name": "vue-text-ellipsis-center",
-  "version": "1.0.2",
-  "description": "",
-  "main": "./dist/vue-text-ellipsis-center.umd.js",
-  "module": "./dist/vue-text-ellipsis-center.umd.js",
-  "browser": "./dist/vue-text-ellipsis-center.umd.js",
-  "types": "dist/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/vue-text-ellipsis-center.es.js",
-      "require": "./dist/vue-text-ellipsis-center.umd.js"
-    }
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/jimchou-h/vue-text-ellipsis-center.git"
-  },
-  "homepage": "https://github.com/jimchou-h/vue-text-ellipsis-center",
-  "bugs": {
-    "url": "https://github.com/jimchou-h/vue-text-ellipsis-center/issues"
-  },
+  "name": "vue-text-ellipsis-center-root",
+  "version": "0.0.0",
+  "description": "Root package for vue-text-ellipsis-center monorepo - A Vue 3 component for intelligent text ellipsis with center truncation support",
+  "private": true,
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "init": "pnpm install",
-    "build-script": "node scripts/build.js",
-    "build": "vite build",
-    "dev": "npm run build && pnpm --filter vue-text-ellipsis-center-examples run dev",
+    "build": "vite build && node scripts/copy-compat-assets.mjs",
+    "build:pages": "node scripts/build-pages.mjs",
+    "prepare:compat": "pnpm build",
+    "dev": "vite build && pnpm --filter vue-text-ellipsis-center-examples run dev",
     "test": "vitest run",
-    "prepublishOnly": "npm run test && npm run build"
+    "test:contracts": "vitest run test/release-contract.test.ts test/render-implementation-contract.test.ts test/vue-compat-contract.test.ts test/core-runtime-deps.test.ts test/docs-examples-contract.test.ts test/vue-bridge.test.ts",
+    "test:e2e": "playwright test",
+    "verify:release": "pnpm test && pnpm build && pnpm test:e2e && node scripts/check-release-contract.mjs && cd src && npm pack --dry-run",
+    "prepublishOnly": "npm run test && npm run build",
+    "lint": "eslint src --ext .ts,.vue,.tsx",
+    "format": "prettier --write src/**/*.{ts,vue,tsx}"
   },
-  "files": [
-    "dist"
-  ],
-  "keywords": [
-    "vue",
-    "ellipsis",
-    "省略号"
-  ],
-  "author": "huangjz",
   "license": "MIT",
-  "peerDependencies": {
-    "vue": "^3.2.0"
+  "engines": {
+    "node": ">=14.0.0",
+    "npm": ">=6.0.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.61.1",
+    "@vitejs/plugin-vue": "^5.2.4",
+    "@vitejs/plugin-vue-jsx": "^5.1.4",
     "@vue/test-utils": "2.3.2",
     "eslint": "^9.26.0",
     "fs-extra": "^11.3.3",
     "prettier": "^3.5.3",
     "rollup": "^4.40.2",
     "typescript": "^5.8.3",
-    "vite-plugin-dts": "^4.5.4"
+    "vite": "^6.3.5",
+    "vite-plugin-dts": "^4.5.4",
+    "vitest": "^3.1.3"
   },
   "dependencies": {
-    "@vitejs/plugin-vue": "^5.2.4",
-    "@vueuse/core": "^14.2.0",
     "intersection-observer": "^0.12.2",
     "runes2": "^1.1.4",
-    "vite": "^6.3.5",
-    "vitest": "^3.1.3"
+    "vue": "^3.5.29"
   }
 }
