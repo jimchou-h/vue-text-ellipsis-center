@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Vue 2.6 功能矩阵</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 24px;
+        font: 14px/1.5 sans-serif;
+      }
+
+      #app {
+        display: grid;
+        gap: 16px;
+      }
+
+      [data-case] {
+        width: 220px;
+      }
+
+      [data-case="rows"] {
+        width: 180px;
+      }
+
+      [data-case="resize"] {
+        width: auto;
+      }
+
+      [data-scroll-spacer] {
+        height: 120vh;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+
+    <script src="https://unpkg.com/vue@2.6.14/dist/vue.js"></script>
+    <script src="https://unpkg.com/@vue/composition-api@1.7.2/dist/vue-composition-api.prod.js"></script>
+    <script src="./vendor/vue-demi.iife.js"></script>
+    <script src="./vendor/vue-text-ellipsis-center.umd.js"></script>
+    <script>
+      Vue.use(VueCompositionAPI);
+      Vue.use(window["vue-text-ellipsis-center"].default);
+
+      new Vue({
+        el: "#app",
+        data() {
+          return {
+            expanded: false,
+            resizeWidth: 180,
+            useObserver: true,
+          };
+        },
+        methods: {
+          openExpanded() {
+            this.expanded = true;
+          },
+          closeExpanded() {
+            this.expanded = false;
+          },
+          onExpandCaseClick(event) {
+            const target = event.target;
+            if (!target || !target.closest) return;
+            if (target.closest('[data-action="expand"]')) {
+              this.openExpanded();
+            }
+            if (target.closest('[data-action="collapse"]')) {
+              this.closeExpanded();
+            }
+          },
+        },
+        template: `
+          <div>
+            <div data-case="middle">
+              <text-ellipsis-center
+                text="这是一段用于 Vue 2.6 基础示例的超长文本内容，会在中间位置自动省略。"
+                direction="middle"
+              />
+            </div>
+
+            <div data-case="start">
+              <text-ellipsis-center
+                text="这是一个用于 Vue 2.6 开头省略验证的超长文本内容。"
+                direction="start"
+              />
+            </div>
+
+            <div data-case="end">
+              <text-ellipsis-center
+                text="这是一个用于 Vue 2.6 结尾省略验证的超长文本内容。"
+                direction="end"
+              />
+            </div>
+
+            <div data-case="rows">
+              <text-ellipsis-center
+                text="这是一个用于 Vue 2.6 多行省略验证的超长文本内容，会在两行内显示并保留省略效果，便于自动化测试判断高度和省略号是否稳定存在。"
+                :rows="2"
+                direction="middle"
+              />
+            </div>
+
+            <div data-case="expand" @click="onExpandCaseClick">
+              <text-ellipsis-center
+                :expanded="expanded"
+                direction="end"
+                text="这是一个用于 Vue 2.6 展开收起验证的超长文本内容，点击按钮后应显示完整内容，再次点击后恢复省略。"
+              >
+                <button slot="expandNode" data-action="expand">
+                  展开
+                </button>
+                <button slot="collapseNode" data-action="collapse">
+                  收起
+                </button>
+              </text-ellipsis-center>
+            </div>
+
+            <div data-case="observer">
+              <div data-scroll-spacer></div>
+              <text-ellipsis-center
+                :use-observer="useObserver"
+                text="这是一个用于 Vue 2.6 懒加载验证的超长文本内容，滚动到可见区域后应自动完成省略计算。"
+                direction="middle"
+              />
+            </div>
+
+            <div data-case="resize">
+              <div :style="'width:' + resizeWidth + 'px'" data-resize-box>
+                <text-ellipsis-center
+                  text="这是一段中等长度文本，窄容器会省略，宽容器会显示完整内容。"
+                  direction="middle"
+                />
+              </div>
+              <button data-action="narrow" @click="resizeWidth = 120">窄</button>
+              <button data-action="wide" @click="resizeWidth = 520">宽</button>
+            </div>
+          </div>
+        `,
+      });
+    </script>
+  </body>
+</html>
