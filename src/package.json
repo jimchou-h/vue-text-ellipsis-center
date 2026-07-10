@@ -1,0 +1,75 @@
+{
+  "name": "vue-text-ellipsis-center",
+  "version": "1.1.1",
+  "description": "Vue 2/3 component for text ellipsis with center truncation support",
+  "main": "./dist/vue-text-ellipsis-center.umd.js",
+  "module": "./dist/vue-text-ellipsis-center.es.js",
+  "browser": "./dist/vue-text-ellipsis-center.umd.js",
+  "types": "./dist/vue-text-ellipsis-center.es.d.ts",
+  "scripts": {
+    "build": "vite build"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/vue-text-ellipsis-center.es.d.ts",
+      "import": "./dist/vue-text-ellipsis-center.es.js",
+      "require": "./dist/vue-text-ellipsis-center.umd.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jimchou-h/vue-text-ellipsis-center.git"
+  },
+  "homepage": "https://github.com/jimchou-h/vue-text-ellipsis-center#readme",
+  "bugs": {
+    "url": "https://github.com/jimchou-h/vue-text-ellipsis-center/issues"
+  },
+  "keywords": [
+    "vue",
+    "ellipsis",
+    "省略号",
+    "text-truncation",
+    "vue-component",
+    "vue3",
+    "text-overflow",
+    "multiline-ellipsis",
+    "center-ellipsis"
+  ],
+  "author": {
+    "name": "huangjz",
+    "email": "1249293339@qq.com",
+    "url": "https://github.com/jimchou-h"
+  },
+  "contributors": [
+    {
+      "name": "huangjz",
+      "email": "1249293339@qq.com",
+      "url": "https://github.com/jimchou-h"
+    }
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=14.0.0",
+    "npm": ">=6.0.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "peerDependencies": {
+    "@vue/composition-api": "^1.7.2",
+    "vue": "^2.6.14 || ^2.7.0 || >=3.2.0"
+  },
+  "peerDependenciesMeta": {
+    "@vue/composition-api": {
+      "optional": true
+    }
+  },
+  "dependencies": {
+    "vue-demi": "^0.14.10"
+  }
+}

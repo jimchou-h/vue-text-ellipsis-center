@@ -9,6 +9,6 @@ echo "🧱 构建项目..."
 pnpm run build
 
 echo "🚀 发布到 npm..."
-npm publish --access public
+cd src && npm publish --access public
 
 echo "✅ 发布成功"

@@ -1,2 +1,13 @@
 node_modules
-dist
+src/dist
+src/README.md
+test-results
+playwright-report
+*.log
+.DS_Store
+
+examples/dist
+
+.cursor
+docs
+openspec
