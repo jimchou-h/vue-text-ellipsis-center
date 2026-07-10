@@ -1,0 +1,3 @@
+fix: 修正 CI 发布契约检查
+
+单测阶段不再要求构建产物已存在，真实产物存在性保留在 build 后的 release contract 脚本中校验；同时移除已提交的 OpenSpec 文档并忽略 openspec 目录。

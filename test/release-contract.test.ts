@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from "node:fs";
+import { readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 
@@ -37,20 +37,16 @@ describe("发布契约", () => {
     expect(exportsRoot.types?.endsWith(".d.ts")).toBe(true);
   });
 
-  it("发布声明的入口文件必须存在于构建产物目录", () => {
+  it("发布声明的入口文件必须指向构建产物目录", () => {
     const pkg = readLibPackage();
     const exportsRoot = pkg.exports?.["."] ?? {};
-    const buildRoot = path.join(repoRoot, "src");
     const declaredPaths = [pkg.main, pkg.module, pkg.types, exportsRoot.types].filter(
       (item): item is string => Boolean(item),
     );
 
     for (const relativePath of declaredPaths) {
-      const artifactPath = path.join(buildRoot, relativePath);
-      expect(
-        existsSync(artifactPath),
-        `构建产物不存在: ${artifactPath}`,
-      ).toBe(true);
+      expect(relativePath.startsWith("./dist/")).toBe(true);
+      expect(relativePath.includes("..")).toBe(false);
     }
   });
 });
